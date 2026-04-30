@@ -1,20 +1,31 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col items-center justify-center p-4">
     <div class="w-full max-w-[400px] space-y-8">
-      <!-- Logo/Brand -->
+      <!-- Header -->
       <div class="text-center">
         <div class="w-12 h-12 bg-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-indigo-200 dark:shadow-none mb-4">C</div>
         <h2 class="text-3xl font-black text-gray-900 dark:text-white tracking-tighter">
-          {{ !showOtpForm ? 'Welcome back' : 'Verify Account' }}
+          {{ !showOtpForm ? 'Create Account' : 'Verify Email' }}
         </h2>
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mt-2">
-          {{ !showOtpForm ? 'Enter your credentials to access your account' : 'Enter the code sent to your email' }}
+          {{ !showOtpForm ? 'Join CrowdSense to manage your venues' : 'Enter the code sent to your email' }}
         </p>
       </div>
 
       <div class="bg-white dark:bg-gray-900 p-8 rounded-[2rem] shadow-xl shadow-gray-100 dark:shadow-none border border-gray-100 dark:border-gray-800">
-        <!-- Login Form -->
-        <form v-if="!showOtpForm" @submit.prevent="handleLogin" class="space-y-6">
+        <!-- Registration Form -->
+        <form v-if="!showOtpForm" @submit.prevent="handleRegister" class="space-y-6">
+          <div class="space-y-2">
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Full Name</label>
+            <input 
+              v-model="form.name" 
+              type="text" 
+              required 
+              placeholder="John Doe"
+              class="w-full px-5 py-3 bg-gray-50 dark:bg-gray-800 border-none rounded-xl focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium dark:text-white outline-none"
+            >
+          </div>
+
           <div class="space-y-2">
             <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
             <input 
@@ -27,12 +38,7 @@
           </div>
           
           <div class="space-y-2">
-            <div class="flex justify-between items-center px-1">
-              <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400">Password</label>
-              <router-link to="/forgot-password" class="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase tracking-widest">
-                Forgot password?
-              </router-link>
-            </div>
+            <label class="block text-[10px] font-bold uppercase tracking-widest text-gray-400 ml-1">Password</label>
             <input 
               v-model="form.password" 
               type="password" 
@@ -42,8 +48,8 @@
             >
           </div>
           
-          <div v-if="error" class="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl">
-            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest text-center">{{ error }}</p>
+          <div v-if="error" class="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl text-center">
+            <p class="text-[10px] font-bold text-red-500 uppercase tracking-widest">{{ error }}</p>
           </div>
           
           <button 
@@ -51,17 +57,17 @@
             :disabled="loading"
             class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black uppercase tracking-widest text-xs py-4 rounded-xl hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
-            {{ loading ? 'Signing in...' : 'Sign in' }}
+            {{ loading ? 'Creating Account...' : 'Sign Up' }}
           </button>
         </form>
 
-        <!-- OTP Verification Form (for unverified accounts) -->
+        <!-- OTP Verification Form -->
         <form v-else @submit.prevent="handleVerifyOtp" class="space-y-6">
           <div class="text-center space-y-4">
-            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Your account needs verification. <br>Check your email <span class="text-gray-900 dark:text-white font-bold">{{ form.email }}</span></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">We've sent a 6-digit code to <br><span class="text-gray-900 dark:text-white font-bold">{{ form.email }}</span></p>
             
             <div class="flex justify-center py-4">
-              <OtpInput :length="6" v-model="otpCode" @complete="handleVerifyOtp" />
+              <OtpInput :length="6" @complete="onOtpComplete" />
             </div>
           </div>
           
@@ -91,13 +97,13 @@
             @click="showOtpForm = false"
             class="w-full text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-gray-600 transition-colors"
           >
-            ← Back to login
+            ← Back to details
           </button>
         </form>
       </div>
       
       <p v-if="!showOtpForm" class="text-center text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-        New here? <router-link to="/register" class="text-indigo-600 hover:text-indigo-700">Create an account</router-link>
+        Already registered? <router-link to="/login" class="text-indigo-600 hover:text-indigo-700">Sign in instead</router-link>
       </p>
     </div>
   </div>
@@ -105,37 +111,31 @@
 
 <script setup>
 import { reactive, ref } from 'vue';
-import { useAuthStore } from '../stores/auth';
+import { useAuthStore } from '../../stores/auth';
 import { useRouter } from 'vue-router';
-import OtpInput from '../components/OtpInput.vue';
+import OtpInput from '../../components/common/OtpInput.vue';
 
 const authStore = useAuthStore();
 const router = useRouter();
 
-const form = reactive({ email: '', password: '' });
+const form = reactive({ name: '', email: '', password: '' });
 const otpCode = ref('');
 const showOtpForm = ref(false);
 const error = ref('');
 const loading = ref(false);
 
-const handleLogin = async () => {
+const onOtpComplete = (otp) => {
+  otpCode.value = otp;
+};
+
+const handleRegister = async () => {
   loading.value = true;
   error.value = '';
   try {
-    await authStore.login(form);
-    router.push(authStore.isAdmin ? '/admin/dashboard' : '/dashboard');
+    await authStore.register(form);
+    showOtpForm.value = true;
   } catch (err) {
-    if (err.response?.status === 403 && err.response?.data?.unverified) {
-      showOtpForm.value = true;
-      // We also trigger an OTP resend automatically to be helpful
-      try {
-        await authStore.resendOtp(form.email);
-      } catch (e) {
-        console.error('Failed to auto-resend OTP');
-      }
-    } else {
-      error.value = err.response?.data?.message || 'Invalid email or password';
-    }
+    error.value = err.response?.data?.message || 'Failed to register';
   } finally {
     loading.value = false;
   }
@@ -146,6 +146,7 @@ const handleResendOtp = async () => {
   error.value = '';
   try {
     await authStore.resendOtp(form.email);
+    // Maybe show a temporary success message
     alert('A new code has been sent to your email.');
   } catch (err) {
     error.value = err.response?.data?.message || 'Failed to resend OTP';
@@ -155,7 +156,10 @@ const handleResendOtp = async () => {
 };
 
 const handleVerifyOtp = async () => {
-  if (otpCode.value.length !== 6) return;
+  if (otpCode.value.length !== 6) {
+    error.value = 'Please enter all 6 digits';
+    return;
+  }
   loading.value = true;
   error.value = '';
   try {

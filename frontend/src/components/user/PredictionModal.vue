@@ -39,7 +39,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue';
-import api from '../services/api';
+import api from '../../services/api';
 
 const props = defineProps({
   isOpen: Boolean,

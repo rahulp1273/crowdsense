@@ -53,8 +53,8 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
-import api from '../services/api';
-import { useUserStore } from '../stores/userStore';
+import api from '../../services/api';
+import { useUserStore } from '../../stores/userStore';
 
 const userStore = useUserStore();
 

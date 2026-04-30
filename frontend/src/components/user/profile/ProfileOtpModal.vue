@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import OtpInput from '../../OtpInput.vue';
+import OtpInput from '../../common/OtpInput.vue';
 
 defineProps({
   isOpen: Boolean,

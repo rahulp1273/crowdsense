@@ -55,7 +55,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import CrowdBadge from './CrowdBadge.vue';
-import InquiryModal from '../../InquiryModal.vue';
+import InquiryModal from '../InquiryModal.vue';
 import { useUserStore } from '../../../stores/userStore';
 
 const props = defineProps({

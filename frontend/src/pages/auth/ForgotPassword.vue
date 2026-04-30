@@ -94,7 +94,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
-import OtpInput from '../components/OtpInput.vue';
+import OtpInput from '../../components/common/OtpInput.vue';
 
 const router = useRouter();
 const step = ref(1);

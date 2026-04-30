@@ -82,7 +82,7 @@ import { useRoute } from 'vue-router';
 import { useUserStore } from '../../stores/userStore';
 import placeService from '../../services/user/placeService';
 import CrowdBadge from '../../components/user/places/CrowdBadge.vue';
-import InquiryModal from '../../components/InquiryModal.vue';
+import InquiryModal from '../../components/user/InquiryModal.vue';
 
 const route = useRoute();
 const userStore = useUserStore();
