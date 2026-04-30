@@ -23,11 +23,11 @@ class InquiryController extends Controller
 
         $query = \App\Models\Inquiry::with(['user:id,name', 'place:id,name'])->latest();
 
-        if ($request->has('place_id')) {
+        if ($request->filled('place_id')) {
             $query->where('place_id', $request->place_id);
         }
         
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
