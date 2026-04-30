@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Admin Actions
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/admin/analytics', [AdminDashboardController::class, 'analytics']);
     Route::get('/admin/places', [AdminPlaceController::class, 'index']);
     Route::get('/admin/inquiries', [AdminInquiryController::class, 'index']);
     Route::patch('/admin/inquiries/{id}/seen', [AdminInquiryController::class, 'markSeen']);
