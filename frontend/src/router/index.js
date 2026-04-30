@@ -56,7 +56,7 @@ const routes = [
   },
 
   // Fallback
-  { path: '/:pathMatch(.*)*', redirect: '/dashboard' }
+  { path: '/:pathMatch(.*)*', redirect: '/' }
 ];
 
 const router = createRouter({
