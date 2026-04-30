@@ -88,4 +88,12 @@ class CheckInService
             ->where('expires_at', '>', now())
             ->first();
     }
+
+    public function getActivePlaceDetails($userId)
+    {
+        $activeCheckIn = $this->getActiveCheckIn($userId);
+        if (!$activeCheckIn) return null;
+
+        return Place::find($activeCheckIn->place_id);
+    }
 }

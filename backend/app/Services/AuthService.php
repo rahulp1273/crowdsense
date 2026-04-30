@@ -123,4 +123,64 @@ class AuthService
             'token' => $token
         ];
     }
+    /**
+     * Send password reset OTP to either Admin or User.
+     */
+    public function sendPasswordResetOtp($email)
+    {
+        $email = strtolower($email);
+        $user = null;
+
+        if (Schema::hasTable('admins')) {
+            $user = Admin::where('email', $email)->first();
+        }
+        
+        if (!$user) {
+            $user = User::where('email', $email)->first();
+        }
+
+        if (!$user) {
+            throw new \Exception('Account not found.', 404);
+        }
+
+        $otp = sprintf("%06d", mt_rand(1, 999999));
+        $user->update([
+            'otp' => $otp,
+            'otp_expires_at' => Carbon::now()->addMinutes(10)
+        ]);
+
+        \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\PasswordResetOtp($otp));
+        \Illuminate\Support\Facades\Log::info("Password reset OTP for {$user->email} is: {$otp}");
+
+        return true;
+    }
+
+    /**
+     * Reset password using OTP.
+     */
+    public function resetPassword(array $data)
+    {
+        $email = strtolower($data['email']);
+        $user = null;
+
+        if (Schema::hasTable('admins')) {
+            $user = Admin::where('email', $email)->first();
+        }
+        
+        if (!$user) {
+            $user = User::where('email', $email)->first();
+        }
+
+        if (!$user || $user->otp !== $data['otp'] || Carbon::now()->isAfter($user->otp_expires_at)) {
+            throw new \Exception('Invalid or expired code.', 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($data['password']),
+            'otp' => null,
+            'otp_expires_at' => null
+        ]);
+
+        return true;
+    }
 }

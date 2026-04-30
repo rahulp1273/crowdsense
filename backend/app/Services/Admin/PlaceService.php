@@ -13,6 +13,13 @@ class PlaceService
         $this->geoService = $geoService;
     }
 
+    public function getAllPlaces()
+    {
+        return \Illuminate\Support\Facades\Cache::remember('all_places', now()->addHours(1), function () {
+            return Place::all();
+        });
+    }
+
     public function createPlace($data)
     {
         if (!empty($data['pincode']) && (empty($data['lat']) || empty($data['lng']))) {

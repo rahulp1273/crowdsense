@@ -21,17 +21,10 @@ class InquiryController extends Controller
             return response()->json(['message' => 'Unauthorized. You do not have permission to read inquiries.'], 403);
         }
 
-        $query = \App\Models\Inquiry::with(['user:id,name', 'place:id,name'])->latest();
+        $filters = $request->only(['status', 'place_id']);
+        $perPage = $request->get('per_page', 15);
 
-        if ($request->filled('place_id')) {
-            $query->where('place_id', $request->place_id);
-        }
-        
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        return response()->json($query->paginate($request->get('per_page', 15)));
+        return response()->json($this->inquiryService->getInquiries($filters, $perPage));
     }
 
     public function markSeen(Request $request, $id)

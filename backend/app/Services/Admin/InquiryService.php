@@ -26,14 +26,19 @@ class InquiryService
         return $inquiry;
     }
 
-    public function getAllInquiries($perPage = 15)
+    public function getInquiries($filters = [], $perPage = 15)
     {
-        return Inquiry::with(['user:id,name', 'place:id,name'])->latest()->paginate($perPage);
-    }
+        $query = Inquiry::with(['user:id,name', 'place:id,name'])->latest();
 
-    public function filterByPlace($placeId)
-    {
-        return Inquiry::with(['user:id,name', 'place:id,name'])->where('place_id', $placeId)->latest()->get();
+        if (!empty($filters['place_id'])) {
+            $query->where('place_id', $filters['place_id']);
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function markSeen($inquiryId)

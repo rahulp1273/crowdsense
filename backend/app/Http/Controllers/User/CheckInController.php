@@ -31,8 +31,7 @@ class CheckInController extends Controller
             );
             return response()->json(['message' => 'Checked in successfully', 'check_in' => $checkIn], 201);
         } catch (\Exception $e) {
-            $activeCheckIn = $this->checkInService->getActiveCheckIn($request->user()->id);
-            $activePlace = $activeCheckIn ? \App\Models\Place::find($activeCheckIn->place_id) : null;
+            $activePlace = $this->checkInService->getActivePlaceDetails($request->user()->id);
             
             return response()->json([
                 'error' => $e->getMessage(),

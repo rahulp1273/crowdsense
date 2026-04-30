@@ -36,10 +36,7 @@ class PlaceController extends Controller
         }
 
         try {
-            // Clearing cache to ensure fresh data after schema changes
-            \Illuminate\Support\Facades\Cache::forget('all_places');
-            $places = Place::all();
-            return response()->json($places);
+            return response()->json($this->placeService->getAllPlaces());
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Failed to fetch places: " . $e->getMessage());
             return response()->json(['message' => 'Database error.', 'error' => $e->getMessage()], 500);
